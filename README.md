@@ -1,49 +1,57 @@
 <!-- BEGIN_TF_DOCS -->
 # Zesty Kompass Insights Azure Module
 
-This module provisions Azure Active Directory (Azure AD) Applications,
+This Terraform module provisions Azure Active Directory (Azure AD) Applications,
 Service Principals, and custom Role Definitions required for Kompass Insights.
 
-## Features:
+## Features
 
-- Creates an Azure AD Application and Service Principal.
-- Optionally creates a Service Principal password (client secret).
-- Creates a custom Azure Role Definition assigned to the Service Principal.
+- Creates an Azure AD Application and associated Service Principal
+- Optionally generates a Service Principal password (client secret)
+- Defines a custom Azure Role and assigns it to the Service Principal
 
 ## Prerequisites
 
-- Azure Subscription
+- An active Azure subscription
+- Sufficient permissions to create Azure AD Applications, Service Principals, and Role Definitions
 
-## Quick Start
-
-To create necessary cloud resources for Kompass Insights:
+## Usage Example
 
 ```hcl
 module "kompass_insights" {
-  source = "TODO"
+  source = "<module-source-path-or-registry>"
 
-  # Create a Service Principal password (client secret)
-  create_service_principal_password = true
+  # Optionally create a Service Principal password (client secret)
+  # create_service_principal_password = true
 }
 ```
 
-This module creates all necessary cloud resources for Kompass Insights.
+By default, this module provisions all required Azure resources for Kompass Insights.
 
-## Service Principal Password (client secret)
+## Retrieving Service Principal Credentials
 
-Kompass Insights requires Service Principals password to access Azure resources.
-You can create a Service Principal password (client secret) by setting the `create_service_principal_password` variable to `true`.
-To read the password, run the following command:
+Kompass Insights requires a Service Principal Client ID and secret for authentication.
+
+To retrieve the Service Principal Client ID:
+
+```bash
+terraform output -raw service_principal_client_id
+```
+
+If you have enabled password creation, retrieve the client secret with:
 
 ```bash
 terraform output -raw service_principal_password
 ```
 
-Optionally you can create a Service Principal password (client secret) manually in Azure Portal or by using the following command:
+Alternatively, you may create a Service Principal password manually via the Azure Portal or CLI:
 
 ```bash
 az ad app credential reset --id $(terraform output -raw application_client_id) --query password --output tsv
 ```
+
+> **Security Notice:**
+> Creating a Service Principal password (client secret) via Terraform will store the secret in plain text in the Terraform state file. For enhanced security, consider generating secrets externally and referencing them as needed.
 
 ## Requirements
 
