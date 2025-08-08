@@ -1,0 +1,1 @@
+# terraform-kompass-insights-azure
