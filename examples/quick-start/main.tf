@@ -32,5 +32,5 @@ module "kompass_insights" {
   source = "../../"
 
   # Create a Service Principal password (client secret)
-  # create_service_principal_password = true
+  create_service_principal_password = var.create_service_principal_password
 }

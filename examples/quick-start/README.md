@@ -47,7 +47,9 @@ No resources.
 
 ## Inputs
 
-No inputs.
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| <a name="input_create_service_principal_password"></a> [create\_service\_principal\_password](#input\_create\_service\_principal\_password) | Determines whether to create a password for the service principal | `bool` | `false` | no |
 
 ## Outputs
 
