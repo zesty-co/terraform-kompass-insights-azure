@@ -1,4 +1,4 @@
-MODULES := ./
+MODULES := ./ examples/quick-start
 
 .PHONY: all
 all: init validate fmt lint clean docs
