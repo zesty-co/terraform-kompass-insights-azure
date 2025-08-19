@@ -59,7 +59,7 @@ variable "managed_identity_tags" {
 variable "create_managed_identity_resource_group" {
   description = "Determines whether to create a Resource Group for the Managed Identity"
   type        = bool
-  default     = true
+  default     = false
   nullable    = false
 }
 
@@ -80,6 +80,46 @@ variable "managed_identity_resource_group_tags" {
   type        = map(string)
   default     = {}
   nullable    = true
+}
+
+variable "create_managed_identity_federated_credential" {
+  description = "Determines whether to create a federated credential for the Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "managed_identity_federated_credential_name" {
+  description = "The name of the federated credential for the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_federated_credential_issuer" {
+  description = "The issuer of the federated credential for the Managed Identity"
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || !var.create_managed_identity_federated_credential || length(var.managed_identity_federated_credential_issuer) > 0
+    error_message = "managed_identity_federated_credential_issuer must be provided."
+  }
+}
+
+variable "kompass_insights_namespace" {
+  description = "The name of the Kompass Insights namespace"
+  type        = string
+  default     = "zesty-system"
+  nullable    = false
+}
+
+variable "kompass_insights_service_account_name" {
+  description = "The name of the Kompass Insights service account"
+  type        = string
+  default     = "kompass-insights-sa"
+  nullable    = false
 }
 
 ################################################################################

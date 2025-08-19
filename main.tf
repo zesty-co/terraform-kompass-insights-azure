@@ -66,11 +66,12 @@ locals {
   current_object_id       = try(data.azuread_client_config.current[0].object_id, null)
   current_subscription_id = try(data.azurerm_subscription.current[0].id, null)
 
-  create_managed_identity                = var.create && var.create_managed_identity
-  create_managed_identity_resource_group = local.create_managed_identity && var.create_managed_identity_resource_group
-  create_service_principal               = var.create && var.create_service_principal
-  create_service_principal_password      = local.create_service_principal && var.create_service_principal_password
-  create_role                            = var.create && var.create_role
+  create_managed_identity                      = var.create && var.create_managed_identity
+  create_managed_identity_resource_group       = local.create_managed_identity && var.create_managed_identity_resource_group
+  create_managed_identity_federated_credential = local.create_managed_identity && var.create_managed_identity_federated_credential
+  create_service_principal                     = var.create && var.create_service_principal
+  create_service_principal_password            = local.create_service_principal && var.create_service_principal_password
+  create_role                                  = var.create && var.create_role
 
   # Tags used for all resources
   tags = {
@@ -107,6 +108,17 @@ resource "azurerm_user_assigned_identity" "this" {
     var.tags,
     var.managed_identity_tags
   )
+}
+
+resource "azurerm_federated_identity_credential" "this" {
+  count = local.create_managed_identity_federated_credential ? 1 : 0
+
+  name                = var.managed_identity_federated_credential_name
+  parent_id           = azurerm_user_assigned_identity.this[0].id
+  resource_group_name = azurerm_user_assigned_identity.this[0].resource_group_name
+  audience            = ["api://AzureADTokenExchange"]
+  issuer              = var.managed_identity_federated_credential_issuer
+  subject             = "system:serviceaccount:${var.kompass_insights_namespace}:${var.kompass_insights_service_account_name}"
 }
 
 resource "azurerm_role_assignment" "managed_identity" {
