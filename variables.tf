@@ -13,13 +13,83 @@ variable "tags" {
 }
 
 ################################################################################
+# Kompass Insights Managed Identity
+################################################################################
+
+variable "create_managed_identity" {
+  description = "Determines whether to create a Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "managed_identity_name" {
+  description = "The name of the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_location" {
+  description = "The location of the Managed Identity. If not provided, the location of the Resource Group for the Managed Identity will be used."
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || length(var.managed_identity_location) > 0 || length(var.managed_identity_resource_group_location) > 0
+    error_message = "managed_identity_location must be provided."
+  }
+}
+
+variable "managed_identity_resource_group_name" {
+  description = "The name of the Resource Group for the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_tags" {
+  description = "A map of tags to add to the Managed Identity"
+  type        = map(string)
+  default     = {}
+  nullable    = true
+}
+
+variable "create_managed_identity_resource_group" {
+  description = "Determines whether to create a Resource Group for the Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "managed_identity_resource_group_location" {
+  description = "The location of the Resource Group for the Managed Identity"
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || !var.create_managed_identity_resource_group || length(var.managed_identity_resource_group_location) > 0
+    error_message = "managed_identity_resource_group_location must be provided."
+  }
+}
+
+variable "managed_identity_resource_group_tags" {
+  description = "A map of tags to add to the Resource Group for the Managed Identity"
+  type        = map(string)
+  default     = {}
+  nullable    = true
+}
+
+################################################################################
 # Kompass Insights Azure AD Service Principal
 ################################################################################
 
 variable "create_service_principal" {
   description = "Determines whether to create an Azure AD Service Principal"
   type        = bool
-  default     = true
+  default     = false
   nullable    = false
 }
 

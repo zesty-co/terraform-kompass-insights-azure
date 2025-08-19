@@ -66,14 +66,56 @@ locals {
   current_object_id       = try(data.azuread_client_config.current[0].object_id, null)
   current_subscription_id = try(data.azurerm_subscription.current[0].id, null)
 
-  create_service_principal          = var.create && var.create_service_principal
-  create_service_principal_password = local.create_service_principal && var.create_service_principal_password
-  create_role                       = var.create && var.create_role
+  create_managed_identity                = var.create && var.create_managed_identity
+  create_managed_identity_resource_group = local.create_managed_identity && var.create_managed_identity_resource_group
+  create_service_principal               = var.create && var.create_service_principal
+  create_service_principal_password      = local.create_service_principal && var.create_service_principal_password
+  create_role                            = var.create && var.create_role
 
   # Tags used for all resources
   tags = {
     Zesty = "true"
   }
+}
+
+################################################################################
+# Kompass Insights Managed Identity
+################################################################################
+resource "azurerm_resource_group" "this" {
+  count = local.create_managed_identity_resource_group ? 1 : 0
+
+  name     = var.managed_identity_resource_group_name
+  location = var.managed_identity_resource_group_location
+
+  tags = merge(
+    local.tags,
+    var.tags,
+    var.managed_identity_resource_group_tags
+  )
+}
+
+resource "azurerm_user_assigned_identity" "this" {
+  count = local.create_managed_identity ? 1 : 0
+
+  name = var.managed_identity_name
+
+  location            = length(var.managed_identity_location) > 0 ? var.managed_identity_location : azurerm_resource_group.this[0].location
+  resource_group_name = length(var.managed_identity_resource_group_name) > 0 ? var.managed_identity_resource_group_name : azurerm_resource_group.this[0].name
+
+  tags = merge(
+    local.tags,
+    var.tags,
+    var.managed_identity_tags
+  )
+}
+
+resource "azurerm_role_assignment" "managed_identity" {
+  count = local.create_managed_identity && local.create_role ? 1 : 0
+
+  scope              = var.role_scope == null ? local.current_subscription_id : var.role_scope
+  description        = var.role_assignment_description
+  role_definition_id = azurerm_role_definition.this[0].role_definition_resource_id
+  principal_id       = azurerm_user_assigned_identity.this[0].principal_id
 }
 
 ################################################################################
@@ -114,6 +156,15 @@ resource "azuread_service_principal" "this" {
   tags = local.service_principal_tags
 }
 
+resource "azurerm_role_assignment" "service_principal" {
+  count = local.create_service_principal && local.create_role ? 1 : 0
+
+  scope              = var.role_scope == null ? local.current_subscription_id : var.role_scope
+  description        = var.role_assignment_description
+  role_definition_id = azurerm_role_definition.this[0].role_definition_resource_id
+  principal_id       = azuread_service_principal.this[0].object_id
+}
+
 ################################################################################
 # Kompass Insights Subscription Role
 ################################################################################
@@ -137,13 +188,4 @@ resource "azurerm_role_definition" "this" {
   }
 
   assignable_scopes = var.role_assignable_scopes == null ? [local.current_subscription_id] : var.role_assignable_scopes
-}
-
-resource "azurerm_role_assignment" "this" {
-  count = local.create_service_principal && local.create_role ? 1 : 0
-
-  scope              = var.role_scope == null ? local.current_subscription_id : var.role_scope
-  description        = var.role_assignment_description
-  role_definition_id = azurerm_role_definition.this[0].role_definition_resource_id
-  principal_id       = azuread_service_principal.this[0].object_id
 }

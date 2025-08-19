@@ -33,4 +33,12 @@ module "kompass_insights" {
 
   # Create a Service Principal password (client secret)
   create_service_principal_password = var.create_service_principal_password
+
+
+
+  # create_managed_identity = false
+  managed_identity_location = "northeurope"
+  managed_identity_resource_group_name = "aks"
+  create_managed_identity_resource_group = false
+  # managed_identity_resource_group_location = "westeurope"
 }
