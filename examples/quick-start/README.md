@@ -33,7 +33,9 @@ For more advanced configuration, see the main module documentation.
 
 ## Providers
 
-No providers.
+| Name | Version |
+|------|---------|
+| <a name="provider_azurerm"></a> [azurerm](#provider\_azurerm) | ~> 4.0 |
 
 ## Modules
 
@@ -43,13 +45,17 @@ No providers.
 
 ## Resources
 
-No resources.
+| Name | Type |
+|------|------|
+| [azurerm_kubernetes_cluster.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/kubernetes_cluster) | data source |
+| [azurerm_resource_group.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/resource_group) | data source |
 
 ## Inputs
 
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
-| <a name="input_create_service_principal_password"></a> [create\_service\_principal\_password](#input\_create\_service\_principal\_password) | Determines whether to create a password for the service principal | `bool` | `false` | no |
+| <a name="input_cluster_name"></a> [cluster\_name](#input\_cluster\_name) | The name of the Kubernetes cluster | `string` | n/a | yes |
+| <a name="input_cluster_resource_group_name"></a> [cluster\_resource\_group\_name](#input\_cluster\_resource\_group\_name) | The name of the Resource Group for the Kubernetes cluster | `string` | n/a | yes |
 
 ## Outputs
 
@@ -59,6 +65,17 @@ No resources.
 | <a name="output_application_display_name"></a> [application\_display\_name](#output\_application\_display\_name) | The Azure AD Application display name |
 | <a name="output_application_object_id"></a> [application\_object\_id](#output\_application\_object\_id) | The Azure AD Application object ID |
 | <a name="output_application_owner_object_ids"></a> [application\_owner\_object\_ids](#output\_application\_owner\_object\_ids) | The Azure AD Application object IDs of the owners |
+| <a name="output_managed_identity_client_id"></a> [managed\_identity\_client\_id](#output\_managed\_identity\_client\_id) | The Client ID of the Managed Identity |
+| <a name="output_managed_identity_federated_credential_id"></a> [managed\_identity\_federated\_credential\_id](#output\_managed\_identity\_federated\_credential\_id) | The resource ID of the Managed Identity Federated Credential |
+| <a name="output_managed_identity_federated_credential_name"></a> [managed\_identity\_federated\_credential\_name](#output\_managed\_identity\_federated\_credential\_name) | The name of the Managed Identity Federated Credential |
+| <a name="output_managed_identity_id"></a> [managed\_identity\_id](#output\_managed\_identity\_id) | The resource ID of the Managed Identity |
+| <a name="output_managed_identity_location"></a> [managed\_identity\_location](#output\_managed\_identity\_location) | The location of the Managed Identity |
+| <a name="output_managed_identity_name"></a> [managed\_identity\_name](#output\_managed\_identity\_name) | The name of the Managed Identity |
+| <a name="output_managed_identity_principal_id"></a> [managed\_identity\_principal\_id](#output\_managed\_identity\_principal\_id) | The Principal ID of the Managed Identity |
+| <a name="output_managed_identity_resource_group_id"></a> [managed\_identity\_resource\_group\_id](#output\_managed\_identity\_resource\_group\_id) | The resource ID of the Resource Group for the Managed Identity |
+| <a name="output_managed_identity_resource_group_location"></a> [managed\_identity\_resource\_group\_location](#output\_managed\_identity\_resource\_group\_location) | The location of the Resource Group for the Managed Identity |
+| <a name="output_managed_identity_resource_group_name"></a> [managed\_identity\_resource\_group\_name](#output\_managed\_identity\_resource\_group\_name) | The name of the Resource Group containing the Managed Identity |
+| <a name="output_managed_identity_tenant_id"></a> [managed\_identity\_tenant\_id](#output\_managed\_identity\_tenant\_id) | The Tenant ID of the Managed Identity |
 | <a name="output_role_definition_id"></a> [role\_definition\_id](#output\_role\_definition\_id) | The Azure AD Role ID |
 | <a name="output_role_definition_resource_id"></a> [role\_definition\_resource\_id](#output\_role\_definition\_resource\_id) | The Azure AD Role resource ID |
 | <a name="output_role_name"></a> [role\_name](#output\_role\_name) | The Azure AD Role name |
