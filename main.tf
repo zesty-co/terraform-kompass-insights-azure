@@ -1,34 +1,53 @@
 /**
  * # Zesty Kompass Insights Azure Module
  *
- * This Terraform module provisions Azure Active Directory (Azure AD) Applications,
- * Service Principals, and custom Role Definitions required for Kompass Insights.
+ * This Terraform module provisions Managed Identity, or optionally a Service Principal,
+ * and custom Role Definitions for Kompass Insights.
  *
  * ## Features
  *
- * - Creates an Azure AD Application and associated Service Principal
+ * - Creates a Managed Identity and associated federated credential
+ * - Optionally creates an Azure AD Application and associated Service Principal
  * - Optionally generates a Service Principal password (client secret)
- * - Defines a custom Azure Role and assigns it to the Service Principal
+ * - Defines a custom Azure Role and assigns it to the Managed Identity or Service Principal
  *
  * ## Prerequisites
  *
  * - An active Azure subscription
- * - Sufficient permissions to create Azure AD Applications, Service Principals, and Role Definitions
+ * - An AKS cluster
+ * - Sufficient permissions to create Managed Identity or Azure AD Application with Service Principal, and Role Definitions
  *
  * ## Usage Example
  *
  * ```hcl
+ * data "azurerm_kubernetes_cluster" "current" {
+ *   name                = var.cluster_name
+ *   resource_group_name = var.cluster_resource_group_name
+ * }
+ *
+ * data "azurerm_resource_group" "current" {
+ *   name = var.cluster_resource_group_name
+ * }
+ *
  * module "kompass_insights" {
  *   source = "<module-source-path-or-registry>"
  *
- *   # Optionally create a Service Principal password (client secret)
- *   # create_service_principal_password = true
+ *   managed_identity_location                    = data.azurerm_resource_group.current.location
+ *   managed_identity_resource_group_name         = data.azurerm_resource_group.current.name
+ *   managed_identity_federated_credential_issuer = data.azurerm_kubernetes_cluster.current.oidc_issuer_url
  * }
  * ```
  *
- * By default, this module provisions all required Azure resources for Kompass Insights.
+ * By default, this module provisions all required Azure resources for Kompass Insights, including:
+ *
+ * - A Managed Identity
+ * - A Managed Identity's federated credential for Kubernetes Workload Identity (Service Account)
+ * - A custom Azure Role
+ * - A role assignment for the Managed Identity
  *
  * ## Retrieving Service Principal Credentials
+ *
+ * > **Security Notice:** Creating a Service Principal password (client secret) via Terraform will store the secret in plain text in the Terraform state file. For enhanced security, consider generating secrets externally and referencing them as needed.
  *
  * Kompass Insights requires a Service Principal Client ID and secret for authentication.
  *
@@ -50,8 +69,6 @@
  * az ad app credential reset --id $(terraform output -raw application_client_id) --query password --output tsv
  * ```
  *
- * > **Security Notice:**
- * > Creating a Service Principal password (client secret) via Terraform will store the secret in plain text in the Terraform state file. For enhanced security, consider generating secrets externally and referencing them as needed.
  */
 
 
@@ -69,8 +86,10 @@ locals {
   create_managed_identity                      = var.create && var.create_managed_identity
   create_managed_identity_resource_group       = local.create_managed_identity && var.create_managed_identity_resource_group
   create_managed_identity_federated_credential = local.create_managed_identity && var.create_managed_identity_federated_credential
+  create_managed_identity_role_assignment      = local.create_managed_identity && var.create_managed_identity_role_assignment
   create_service_principal                     = var.create && var.create_service_principal
   create_service_principal_password            = local.create_service_principal && var.create_service_principal_password
+  create_service_principal_role_assignment     = local.create_service_principal && var.create_service_principal_role_assignment
   create_role                                  = var.create && var.create_role
 
   # Tags used for all resources
@@ -122,12 +141,13 @@ resource "azurerm_federated_identity_credential" "this" {
 }
 
 resource "azurerm_role_assignment" "managed_identity" {
-  count = local.create_managed_identity && local.create_role ? 1 : 0
+  count = local.create_managed_identity_role_assignment ? 1 : 0
 
-  scope              = var.role_scope == null ? local.current_subscription_id : var.role_scope
-  description        = var.role_assignment_description
-  role_definition_id = azurerm_role_definition.this[0].role_definition_resource_id
-  principal_id       = azurerm_user_assigned_identity.this[0].principal_id
+  scope                = var.role_scope == null ? local.current_subscription_id : var.role_scope
+  description          = var.role_assignment_description
+  role_definition_id   = local.create_role ? azurerm_role_definition.this[0].role_definition_resource_id : var.role_definition_id
+  role_definition_name = local.create_role ? null : ((var.role_definition_id == null || length(var.role_definition_id) == 0) ? var.role_name : null)
+  principal_id         = azurerm_user_assigned_identity.this[0].principal_id
 }
 
 ################################################################################
@@ -169,12 +189,13 @@ resource "azuread_service_principal" "this" {
 }
 
 resource "azurerm_role_assignment" "service_principal" {
-  count = local.create_service_principal && local.create_role ? 1 : 0
+  count = local.create_service_principal_role_assignment ? 1 : 0
 
-  scope              = var.role_scope == null ? local.current_subscription_id : var.role_scope
-  description        = var.role_assignment_description
-  role_definition_id = azurerm_role_definition.this[0].role_definition_resource_id
-  principal_id       = azuread_service_principal.this[0].object_id
+  scope                = var.role_scope == null ? local.current_subscription_id : var.role_scope
+  description          = var.role_assignment_description
+  role_definition_id   = local.create_role ? azurerm_role_definition.this[0].role_definition_resource_id : var.role_definition_id
+  role_definition_name = local.create_role ? null : ((var.role_definition_id == null || length(var.role_definition_id) == 0) ? var.role_name : null)
+  principal_id         = azuread_service_principal.this[0].object_id
 }
 
 ################################################################################

@@ -1,4 +1,63 @@
 ################################################################################
+# Kompass Insights Managed Identity
+################################################################################
+
+output "managed_identity_resource_group_id" {
+  description = "The resource ID of the Resource Group for the Managed Identity"
+  value       = try(azurerm_resource_group.this[0].id, null)
+}
+
+output "managed_identity_resource_group_location" {
+  description = "The location of the Resource Group for the Managed Identity"
+  value       = try(azurerm_resource_group.this[0].location, null)
+}
+
+output "managed_identity_id" {
+  description = "The resource ID of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].id, null)
+}
+
+output "managed_identity_name" {
+  description = "The name of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].name, null)
+}
+
+output "managed_identity_location" {
+  description = "The location of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].location, null)
+}
+
+output "managed_identity_resource_group_name" {
+  description = "The name of the Resource Group containing the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].resource_group_name, null)
+}
+
+output "managed_identity_client_id" {
+  description = "The Client ID of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].client_id, null)
+}
+
+output "managed_identity_principal_id" {
+  description = "The Principal ID of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].principal_id, null)
+}
+
+output "managed_identity_tenant_id" {
+  description = "The Tenant ID of the Managed Identity"
+  value       = try(azurerm_user_assigned_identity.this[0].tenant_id, null)
+}
+
+output "managed_identity_federated_credential_id" {
+  description = "The resource ID of the Managed Identity Federated Credential"
+  value       = try(azurerm_federated_identity_credential.this[0].id, null)
+}
+
+output "managed_identity_federated_credential_name" {
+  description = "The name of the Managed Identity Federated Credential"
+  value       = try(azurerm_federated_identity_credential.this[0].name, null)
+}
+
+################################################################################
 # Kompass Insights Azure AD Service Principal
 ################################################################################
 

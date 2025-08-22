@@ -108,6 +108,13 @@ variable "managed_identity_federated_credential_issuer" {
   }
 }
 
+variable "create_managed_identity_role_assignment" {
+  description = "Determines whether to create a role assignment for the Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 variable "kompass_insights_namespace" {
   description = "The name of the Kompass Insights namespace"
   type        = string
@@ -196,6 +203,13 @@ variable "service_principal_password_rotate_when_changed" {
   nullable    = true
 }
 
+variable "create_service_principal_role_assignment" {
+  description = "Determines whether to create a role assignment for the Service Principal"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 ################################################################################
 # Kompass Insights Subscription Role
 ################################################################################
@@ -212,6 +226,13 @@ variable "role_name" {
   type        = string
   default     = "KompassInsights"
   nullable    = false
+}
+
+variable "role_definition_id" {
+  description = "ID of the role definition"
+  type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "role_description" {
