@@ -1,27 +1,23 @@
 <!-- BEGIN_TF_DOCS -->
-# Quick Start Example — Kompass Insights Azure
+# Quick Start
 
-This example demonstrates how to use the Kompass Insights Azure module to provision the required Azure AD Application, Service Principal, and custom Role Definition for Kompass Insights.
+This example shows how to install Kompass Insights module with the most basic setup.
+It deploys Kompass Insights, which creates the cloud resources for Kompass Insights.
 
-## Usage
+Before applying the module, ensure that the providers target the correct Azure subscription.
+You need to ensure the following:
 
-```hcl
-module "kompass_insights" {
-  source = "../../"
+1. The Azure RM provider is configured to target the correct Azure subscription.
+   Azure subscription ID have to configured through the `ARM_SUBSCRIPTION_ID` environment variable or in the provider block.
 
-  # Optionally create a Service Principal password (client secret)
-  # create_service_principal_password = true
-}
-```
+2. The name of the AKS cluster and AKS's resource group name are provided in the `cluster_name`
+   and `cluster_resource_group_name` variable through a tfvars or env var.
+   See [variables.tf](./variables.tf) for more details.
 
-By default, this will create all necessary Azure resources.
-To retrieve the Service Principal password (if created), run:
+The module works in the following order:
 
-```bash
-terraform output -raw service_principal_password
-```
-
-For more advanced configuration, see the main module documentation.
+1. Scrapes the AKS cluster for information.
+2. Creates the cloud resources for Kompass Insights.
 
 ## Requirements
 

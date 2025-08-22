@@ -1,23 +1,59 @@
 /**
  * # Zesty Kompass Insights Azure Module
  *
- * This Terraform module provisions Managed Identity, or optionally a Service Principal,
- * and custom Role Definitions for Kompass Insights.
+ * This module provisions the Azure prerequisites for Kompass Insights on AKS.
  *
- * ## Features
+ * It creates a Managed Identity (with a federated credential for AKS Workload Identity),
+ * and a custom Role Definition with optional role assignments. Optionally, it can
+ * create an Azure AD Application + Service Principal (with an optional client secret).
  *
- * - Creates a Managed Identity and associated federated credential
- * - Optionally creates an Azure AD Application and associated Service Principal
- * - Optionally generates a Service Principal password (client secret)
- * - Defines a custom Azure Role and assigns it to the Managed Identity or Service Principal
+ * ## Table of Contents
+ *
+ * - [Prerequisites](#prerequisites)
+ * - [Quick Start](#quick-start)
+ * - [Installation instructions](#installation-instructions)
+ * - [Deployed Resources](#deployed-resources)
+ * - [Advanced Usage](#advanced-usage)
+ * - [API Reference](#requirements)
  *
  * ## Prerequisites
  *
- * - An active Azure subscription
- * - An AKS cluster
- * - Sufficient permissions to create Managed Identity or Azure AD Application with Service Principal, and Role Definitions
+ * - Terraform 1.0+
+ * - Azure subscription with permissions to manage identities and roles
+ * - AKS cluster (for Workload Identity OIDC issuer)
+ * - Azure CLI or service principal credentials for authentication
  *
- * ## Usage Example
+ * ## Quick Start
+ *
+ * There are two typical ways to use this module:
+ *
+ * 1. Using the example in `examples/quick-start/`.
+ * 2. Using the [instructions below](#installation-instructions).
+ *
+ * ## Installation instructions
+ *
+ * The simplest way to install involves creating a Terraform configuration with the following components:
+ *
+ * 1. A provider section that helps with the following things:
+ *    1. Azure RM provider - Get cluster information.
+ *    2. Azure AD provider - Create the Azure AD application and service principal.
+ * 2. Invocation of the kompass-insights module that installs all required Azure resources.
+ *
+ * Below is a sample configuration for the necessary providers that help perform the later steps.
+ *
+ * If your setup is different, you will need to adjust the configuration accordingly.
+ *
+ * ```hcl
+ * provider "azuread" {}
+ *
+ * provider "azurerm" {
+ *   # Provide subscription_id or set the environment variable ARM_SUBSCRIPTION_ID
+ *   # subscription_id = ""
+ *   features {}
+ * }
+ * ```
+ *
+ * Below is a configuration that deploys the Kompass Insights module.
  *
  * ```hcl
  * data "azurerm_kubernetes_cluster" "current" {
@@ -38,37 +74,44 @@
  * }
  * ```
  *
- * By default, this module provisions all required Azure resources for Kompass Insights, including:
+ * ## Deployed Resources
  *
- * - A Managed Identity
- * - A Managed Identity's federated credential for Kubernetes Workload Identity (Service Account)
- * - A custom Azure Role
- * - A role assignment for the Managed Identity
+ * - User Assigned Managed Identity (`azurerm_user_assigned_identity`) with tags
+ * - Federated Identity Credential (`azurerm_federated_identity_credential`) bound to the Managed Identity
+ * - Optional Resource Group (`azurerm_resource_group`) for the Managed Identity
+ * - Custom Role Definition (`azurerm_role_definition`) with minimal read permissions for Kompass Insights
+ * - Role Assignments (`azurerm_role_assignment`) for either the Managed Identity or Service Principal
+ * - Optional Azure AD resources when enabled:
+ *   - Application (`azuread_application`)
+ *   - Service Principal (`azuread_service_principal`)
+ *   - Application Password (`azuread_application_password`)
  *
- * ## Retrieving Service Principal Credentials
+ * ## Advanced Usage
  *
- * > **Security Notice:** Creating a Service Principal password (client secret) via Terraform will store the secret in plain text in the Terraform state file. For enhanced security, consider generating secrets externally and referencing them as needed.
+ * ### Use an existing Resource Group
  *
- * Kompass Insights requires a Service Principal Client ID and secret for authentication.
+ * Set `create_managed_identity_resource_group = false` and provide
+ * `managed_identity_resource_group_name` and `managed_identity_location`.
  *
- * To retrieve the Service Principal Client ID:
+ * ### Control role creation and assignment
+ *
+ * - To use an existing role, set `create_role = false` and pass either
+ *   `role_definition_id` or `role_name`.
+ *
+ * ### Use Service Principal instead of Managed Identity
+ *
+ * Enable the Service Principal path by setting `create_service_principal = true`.
+ * Optionally create a client secret with `create_service_principal_password = true`.
+ *
+ * Security note: Creating secrets with Terraform stores them in state in plaintext.
+ * Consider creating secrets externally and passing them securely instead.
+ *
+ * ### Retrieving Service Principal credentials (when enabled)
  *
  * ```bash
  * terraform output -raw service_principal_client_id
- * ```
- *
- * If you have enabled password creation, retrieve the client secret with:
- *
- * ```bash
  * terraform output -raw service_principal_password
  * ```
- *
- * Alternatively, you may create a Service Principal password manually via the Azure Portal or CLI:
- *
- * ```bash
- * az ad app credential reset --id $(terraform output -raw application_client_id) --query password --output tsv
- * ```
- *
  */
 
 
