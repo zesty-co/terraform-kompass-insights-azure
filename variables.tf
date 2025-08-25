@@ -13,13 +13,130 @@ variable "tags" {
 }
 
 ################################################################################
+# Kompass Insights Managed Identity
+################################################################################
+
+variable "create_managed_identity" {
+  description = "Determines whether to create a Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "managed_identity_name" {
+  description = "The name of the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_location" {
+  description = "The location of the Managed Identity. If not provided, the location of the Resource Group for the Managed Identity will be used."
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || length(var.managed_identity_location) > 0 || length(var.managed_identity_resource_group_location) > 0
+    error_message = "managed_identity_location must be provided."
+  }
+}
+
+variable "managed_identity_resource_group_name" {
+  description = "The name of the Resource Group for the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_tags" {
+  description = "A map of tags to add to the Managed Identity"
+  type        = map(string)
+  default     = {}
+  nullable    = true
+}
+
+variable "create_managed_identity_resource_group" {
+  description = "Determines whether to create a Resource Group for the Managed Identity"
+  type        = bool
+  default     = false
+  nullable    = false
+}
+
+variable "managed_identity_resource_group_location" {
+  description = "The location of the Resource Group for the Managed Identity"
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || !var.create_managed_identity_resource_group || length(var.managed_identity_resource_group_location) > 0
+    error_message = "managed_identity_resource_group_location must be provided."
+  }
+}
+
+variable "managed_identity_resource_group_tags" {
+  description = "A map of tags to add to the Resource Group for the Managed Identity"
+  type        = map(string)
+  default     = {}
+  nullable    = true
+}
+
+variable "create_managed_identity_federated_credential" {
+  description = "Determines whether to create a federated credential for the Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "managed_identity_federated_credential_name" {
+  description = "The name of the federated credential for the Managed Identity"
+  type        = string
+  default     = "kompass-insights"
+  nullable    = false
+}
+
+variable "managed_identity_federated_credential_issuer" {
+  description = "The issuer of the federated credential for the Managed Identity"
+  type        = string
+  default     = ""
+  nullable    = false
+
+  validation {
+    condition     = !var.create_managed_identity || !var.create_managed_identity_federated_credential || length(var.managed_identity_federated_credential_issuer) > 0
+    error_message = "managed_identity_federated_credential_issuer must be provided."
+  }
+}
+
+variable "create_managed_identity_role_assignment" {
+  description = "Determines whether to create a role assignment for the Managed Identity"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
+variable "kompass_insights_namespace" {
+  description = "The name of the Kompass Insights namespace"
+  type        = string
+  default     = "zesty-system"
+  nullable    = false
+}
+
+variable "kompass_insights_service_account_name" {
+  description = "The name of the Kompass Insights service account"
+  type        = string
+  default     = "kompass-insights-sa"
+  nullable    = false
+}
+
+################################################################################
 # Kompass Insights Azure AD Service Principal
 ################################################################################
 
 variable "create_service_principal" {
   description = "Determines whether to create an Azure AD Service Principal"
   type        = bool
-  default     = true
+  default     = false
   nullable    = false
 }
 
@@ -86,6 +203,13 @@ variable "service_principal_password_rotate_when_changed" {
   nullable    = true
 }
 
+variable "create_service_principal_role_assignment" {
+  description = "Determines whether to create a role assignment for the Service Principal"
+  type        = bool
+  default     = true
+  nullable    = false
+}
+
 ################################################################################
 # Kompass Insights Subscription Role
 ################################################################################
@@ -102,6 +226,13 @@ variable "role_name" {
   type        = string
   default     = "KompassInsights"
   nullable    = false
+}
+
+variable "role_definition_id" {
+  description = "ID of the role definition"
+  type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "role_description" {

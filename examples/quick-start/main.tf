@@ -1,29 +1,34 @@
 /**
- * # Quick Start Example — Kompass Insights Azure
+ * # Quick Start
  *
- * This example demonstrates how to use the Kompass Insights Azure module to provision the required Azure AD Application, Service Principal, and custom Role Definition for Kompass Insights.
+ * This example shows how to install Kompass Insights module with the most basic setup.
+ * It deploys Kompass Insights, which creates the cloud resources for Kompass Insights.
  *
- * ## Usage
  *
- * ```hcl
- * module "kompass_insights" {
- *   source = "../../"
+ * Before applying the module, ensure that the providers target the correct Azure subscription.
+ * You need to ensure the following:
  *
- *   # Optionally create a Service Principal password (client secret)
- *   # create_service_principal_password = true
- * }
- * ```
+ * 1. The Azure RM provider is configured to target the correct Azure subscription.
+ *    Azure subscription ID have to configured through the `ARM_SUBSCRIPTION_ID` environment variable or in the provider block.
  *
- * By default, this will create all necessary Azure resources.
- * To retrieve the Service Principal password (if created), run:
+ * 2. The name of the AKS cluster and AKS's resource group name are provided in the `cluster_name`
+ *    and `cluster_resource_group_name` variable through a tfvars or env var.
+ *    See [variables.tf](./variables.tf) for more details.
  *
- * ```bash
- * terraform output -raw service_principal_password
- * ```
+ * The module works in the following order:
  *
- * For more advanced configuration, see the main module documentation.
- *
+ * 1. Scrapes the AKS cluster for information.
+ * 2. Creates the cloud resources for Kompass Insights.
  */
+
+data "azurerm_kubernetes_cluster" "current" {
+  name                = var.cluster_name
+  resource_group_name = var.cluster_resource_group_name
+}
+
+data "azurerm_resource_group" "current" {
+  name = var.cluster_resource_group_name
+}
 
 # Creates the cloud resources for Kompass Compute.
 module "kompass_insights" {
@@ -31,6 +36,7 @@ module "kompass_insights" {
   # version = "~> 1.0.0"
   source = "../../"
 
-  # Create a Service Principal password (client secret)
-  create_service_principal_password = var.create_service_principal_password
+  managed_identity_location                    = data.azurerm_resource_group.current.location
+  managed_identity_resource_group_name         = data.azurerm_resource_group.current.name
+  managed_identity_federated_credential_issuer = data.azurerm_kubernetes_cluster.current.oidc_issuer_url
 }
