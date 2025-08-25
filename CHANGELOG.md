@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.1.0](https://github.com/zesty-co/terraform-kompass-insights-azure/compare/v1.0.0...v1.1.0) (2025-08-25)
+
+
+### Features
+
+* Add support for managed identity (KPS-2807) ([#2](https://github.com/zesty-co/terraform-kompass-insights-azure/issues/2)) ([5c063ae](https://github.com/zesty-co/terraform-kompass-insights-azure/commit/5c063ae55930f564959fe52aa46d1d43c9acbcce))
+
 ## 1.0.0 (2025-08-11)
 
 
