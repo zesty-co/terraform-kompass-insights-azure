@@ -1,4 +1,3 @@
-<!-- BEGIN_TF_DOCS -->
 # Zesty Kompass Insights Azure Module
 
 This module provisions the Azure prerequisites for Kompass Insights on AKS.
@@ -113,6 +112,7 @@ terraform output -raw service_principal_client_id
 terraform output -raw service_principal_password
 ```
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
