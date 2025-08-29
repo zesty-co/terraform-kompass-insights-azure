@@ -1,4 +1,3 @@
-<!-- BEGIN_TF_DOCS -->
 # Quick Start
 
 This example shows how to install Kompass Insights module with the most basic setup.
@@ -19,6 +18,7 @@ The module works in the following order:
 1. Scrapes the AKS cluster for information.
 2. Creates the cloud resources for Kompass Insights.
 
+<!-- BEGIN_TF_DOCS -->
 ## Requirements
 
 | Name | Version |
