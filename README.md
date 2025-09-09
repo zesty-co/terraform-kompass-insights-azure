@@ -65,7 +65,7 @@ data "azurerm_resource_group" "current" {
 }
 
 module "kompass_insights" {
-  source = "<module-source-path-or-registry>"
+  source = "zesty-co/insights-azure/kompass"
 
   managed_identity_location                    = data.azurerm_resource_group.current.location
   managed_identity_resource_group_name         = data.azurerm_resource_group.current.name
