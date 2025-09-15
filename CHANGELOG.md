@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.2.0](https://github.com/zesty-co/terraform-kompass-insights-azure/compare/v1.1.0...v1.2.0) (2025-09-15)
+
+
+### Features
+
+* Add CODEOWNERS ([#4](https://github.com/zesty-co/terraform-kompass-insights-azure/issues/4)) ([7a1f6c2](https://github.com/zesty-co/terraform-kompass-insights-azure/commit/7a1f6c23ad0661160b77f9d036a61d367c3526ed))
+
 ## [1.1.0](https://github.com/zesty-co/terraform-kompass-insights-azure/compare/v1.0.0...v1.1.0) (2025-08-25)
 
 
