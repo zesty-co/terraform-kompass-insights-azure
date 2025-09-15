@@ -37,7 +37,7 @@ The module works in the following order:
 
 | Name | Source | Version |
 |------|--------|---------|
-| <a name="module_kompass_insights"></a> [kompass\_insights](#module\_kompass\_insights) | zesty-co/insights-azure/kompass | ~> 1.1.0 |
+| <a name="module_kompass_insights"></a> [kompass\_insights](#module\_kompass\_insights) | zesty-co/insights-azure/kompass | >= 1.0.0, < 2.0.0 |
 
 ## Resources
 
