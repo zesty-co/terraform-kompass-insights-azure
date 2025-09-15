@@ -11,7 +11,7 @@ data "azurerm_resource_group" "current" {
 module "kompass_insights" {
   # source = "../../"
   source  = "zesty-co/insights-azure/kompass"
-  version = "~> 1.1.0"
+  version = ">= 1.0.0, < 2.0.0"
 
   managed_identity_location                    = data.azurerm_resource_group.current.location
   managed_identity_resource_group_name         = data.azurerm_resource_group.current.name
