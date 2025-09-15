@@ -9,9 +9,9 @@ data "azurerm_resource_group" "current" {
 
 # Creates the cloud resources for Kompass Compute.
 module "kompass_insights" {
-  # source  = "zesty-co/compute/kompass"
-  # version = "~> 1.0.0"
-  source = "../../"
+  # source = "../../"
+  source  = "zesty-co/insights-azure/kompass"
+  version = ">= 1.0.0, < 2.0.0"
 
   managed_identity_location                    = data.azurerm_resource_group.current.location
   managed_identity_resource_group_name         = data.azurerm_resource_group.current.name
