@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0](https://github.com/zesty-co/terraform-kompass-insights-azure/compare/v1.2.0...v1.3.0) (2025-10-06)
+
+
+### Features
+
+* Add required minimal version of Terraform ([#6](https://github.com/zesty-co/terraform-kompass-insights-azure/issues/6)) ([713b116](https://github.com/zesty-co/terraform-kompass-insights-azure/commit/713b1164c7c49e138fd4b4d75663a87cc2935d1f))
+
 ## [1.2.0](https://github.com/zesty-co/terraform-kompass-insights-azure/compare/v1.1.0...v1.2.0) (2025-09-15)
 
 
